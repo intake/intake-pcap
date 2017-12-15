@@ -1,0 +1,38 @@
+import pytest
+
+from intake_pcap import OfflineStream
+
+from .utils import dataframe_has_required_columns
+
+
+def test_offline_unfiltered(ping_stream):
+    df = ping_stream.to_dataframe()
+    assert dataframe_has_required_columns(df)
+    assert len(df) == 96
+
+
+def test_offline_filter_tcp(http_stream):
+    http_stream.to_bpf("tcp")
+    df = http_stream.to_dataframe()
+    assert dataframe_has_required_columns(df)
+    assert len(df) == 41
+
+
+def test_offline_filter_udp(http_stream):
+    http_stream.to_bpf("udp")
+    df = http_stream.to_dataframe()
+    assert dataframe_has_required_columns(df)
+    assert len(df) == 2
+
+
+def test_offline_filter_icmp(http_stream):
+    http_stream.to_bpf("icmp")
+    df = http_stream.to_dataframe()
+    assert dataframe_has_required_columns(df)
+    assert len(df) == 0
+
+
+def test_offline_limit(http_stream):
+    df = http_stream.to_dataframe(n=10)
+    assert dataframe_has_required_columns(df)
+    assert len(df) == 10

@@ -1,0 +1,17 @@
+plugins:
+  source:
+    - module: intake_pcap
+sources:
+  ping:
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/96pings.pcap'
+  raw_http:
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
+  tcp_http:
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
+      protocol: tcp
