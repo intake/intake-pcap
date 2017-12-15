@@ -1,7 +1,3 @@
-import pytest
-
-from intake_pcap import OfflineStream
-
 from .utils import dataframe_has_required_columns
 
 

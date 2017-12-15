@@ -1,7 +1,3 @@
-import pytest
-
-from intake_pcap import PCAPSource
-
 from .utils import dataframe_has_required_columns
 
 
