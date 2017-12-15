@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     r = pcapy.open_live(interface, 2**16, True, 1000)
     w = r.dump_open(path)
-            
+
     def decode_ethernet_payload(header, data):
         w.dump(header, data)
         print(EthDecoder().decode(data))
