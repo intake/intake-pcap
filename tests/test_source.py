@@ -21,3 +21,14 @@ def test_filtered_source(tcp_http_source):
     assert len(df) == 41
 
     tcp_http_source.close()
+
+
+def test_multiple_source(multiple_source):
+    metadata = multiple_source.discover()
+    assert metadata['npartitions'] == 2
+
+    df = multiple_source.read()
+    assert dataframe_has_required_columns(df)
+    assert len(df) == 139
+
+    multiple_source.close()

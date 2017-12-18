@@ -18,6 +18,7 @@ requirements:
     - python
     - pandas
     - libpcap
+    - dask
     - intake
 
 test:
