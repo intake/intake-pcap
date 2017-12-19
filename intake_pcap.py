@@ -23,9 +23,9 @@ class Plugin(base.Plugin):
 
 
 class PacketStream(object):
-    def __init__(self):
-        self._reader = None
-        self._bpf = "ip"
+    def __init__(self, reader, protocol):
+        self._reader = reader
+        self.to_bpf(protocol)
 
     def to_bpf(self, protocol):
         if protocol:
@@ -97,16 +97,14 @@ class PacketStream(object):
 
 class LiveStream(PacketStream):
     def __init__(self, interface, protocol=None, max_packet=2**16, timeout=1000):
-        super(LiveStream, self).__init__()
-        self._reader = pcapy.open_live(interface, max_packet, 1, timeout)
-        self.to_bpf(protocol)
+        reader = pcapy.open_live(interface, max_packet, 1, timeout)
+        super(LiveStream, self).__init__(reader, protocol)
 
 
 class OfflineStream(PacketStream):
     def __init__(self, path, protocol=None):
-        super(OfflineStream, self).__init__()
-        self._reader = pcapy.open_offline(path)
-        self.to_bpf(protocol)
+        reader = pcapy.open_offline(path)
+        super(OfflineStream, self).__init__(reader, protocol)
 
 
 class PCAPSource(base.DataSource):
