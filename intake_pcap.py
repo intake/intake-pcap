@@ -167,8 +167,8 @@ class PacketStream(object):
             src_port=packet.source_ip_port,
             dst_host=packet.destination_ip_address,
             dst_port=packet.destination_ip_port,
-            protocol=packet.ip_protocol)
-            #payload=packet.payload)
+            protocol=packet.ip_protocol,
+            payload=packet.payload)
 
     def to_dataframe(self, n=-1):
         packets = []
@@ -185,9 +185,8 @@ class PacketStream(object):
             ('src_port', 'object'),
             ('dst_host', 'object'),
             ('dst_port', 'object'),
-            ('protocol', 'object')])
-            #('protocol', 'object'),
-            #('payload', 'object')])
+            ('protocol', 'object'),
+            ('payload', 'object')])
 
         df = pd.DataFrame(packets, columns=dtypes.keys())
         return df.astype(dtype=dtypes)
