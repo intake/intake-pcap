@@ -6,7 +6,7 @@ install a mixture of conda and pip packages. The install instructions are:
 ```
 conda install -c intake intake
 conda install libpcap
-pip install pcapy impacket
+pip install pcapy
 python setup.py develop
 ```
 

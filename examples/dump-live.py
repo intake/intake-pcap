@@ -1,7 +1,8 @@
 import sys
 
-from impacket.ImpactDecoder import EthDecoder
 import pcapy
+
+from intake_pcap import IPPacket
 
 
 if __name__ == '__main__':
@@ -18,7 +19,8 @@ if __name__ == '__main__':
 
     def decode_ethernet_payload(header, data):
         w.dump(header, data)
-        print(EthDecoder().decode(data))
+        packet = IPPacket(data)
+        print(packet.source_mac_address, packet.destination_mac_address, packet.ethernet_protocol)
 
     r.loop(limit, decode_ethernet_payload)
     w.close()
