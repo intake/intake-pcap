@@ -23,11 +23,12 @@ requirements:
 
 test:
   requires:
+    - intake
     - pytest
     - pytest-cov
     - coverage
-  commands:
-    - py.test --pyargs
+  imports:
+    - intake_pcap
 
 about:
   home: https://github.com/ContinuumIO/intake-pcap

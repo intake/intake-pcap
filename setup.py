@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 requires = open('requirements.txt').read().strip().split('\n')
@@ -13,10 +13,10 @@ setup(
     maintainer='Joseph Crail',
     maintainer_email='jbcrail@gmail.com',
     license='BSD',
+    py_modules=['intake_pcap'],
     package_data={'': ['*.pcap', '*.yml', '*.html']},
     include_package_data=True,
     install_requires=requires,
-    packages=find_packages(),
     long_description=open('README.md').read(),
     zip_safe=False,
 )
