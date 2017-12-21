@@ -6,7 +6,7 @@ def test_unfiltered_source(ping_source):
     assert metadata['npartitions'] == 1
 
     df = ping_source.read()
-    assert dataframe_has_required_columns(df)
+    assert dataframe_has_required_columns(df, payload=False)
     assert len(df) == 96
 
     ping_source.close()
@@ -17,7 +17,7 @@ def test_filtered_source(tcp_http_source):
     assert metadata['npartitions'] == 1
 
     df = tcp_http_source.read()
-    assert dataframe_has_required_columns(df)
+    assert dataframe_has_required_columns(df, payload=False)
     assert len(df) == 41
 
     tcp_http_source.close()
@@ -28,7 +28,7 @@ def test_multiple_source(multiple_source):
     assert metadata['npartitions'] == 2
 
     df = multiple_source.read()
-    assert dataframe_has_required_columns(df)
+    assert dataframe_has_required_columns(df, payload=False)
     assert len(df) == 139
 
     multiple_source.close()

@@ -154,40 +154,46 @@ class PacketStream(object):
         else:
             self._bpf = "ip"
 
-    @staticmethod
-    def decode_ip_payload(header, data):
-        seconds, fractional = header.getts()
-        ts = pd.to_datetime(10**6 * seconds + fractional, unit='us')
-
-        packet = IPPacket(data)
-
-        return dict(
-            time=ts,
-            src_host=packet.source_ip_address,
-            src_port=packet.source_ip_port,
-            dst_host=packet.destination_ip_address,
-            dst_port=packet.destination_ip_port,
-            protocol=packet.ip_protocol,
-            payload=packet.payload)
-
-    def to_dataframe(self, n=-1):
+    def to_dataframe(self, n=-1, payload=False):
         packets = []
 
+        def decode_ip_packet(header, data):
+            seconds, fractional = header.getts()
+            ts = pd.to_datetime(10**6 * seconds + fractional, unit='us')
+
+            packet = IPPacket(data)
+
+            items = [
+                ('time', ts),
+                ('src_host', packet.source_ip_address),
+                ('src_port', packet.source_ip_port),
+                ('dst_host', packet.destination_ip_address),
+                ('dst_port', packet.destination_ip_port),
+                ('protocol', packet.ip_protocol)]
+
+            if payload:
+                items.append(('payload', packet.payload))
+
+            return dict(items)
+
         def decoder(header, data):
-            packets.append(PacketStream.decode_ip_payload(header, data))
+            packets.append(decode_ip_packet(header, data))
 
         self._reader.setfilter(self._bpf)
         self._reader.loop(n, decoder)
 
-        dtypes = OrderedDict([
+        items = [
             ('time', 'datetime64[ns]'),
             ('src_host', 'object'),
             ('src_port', 'object'),
             ('dst_host', 'object'),
             ('dst_port', 'object'),
-            ('protocol', 'object'),
-            ('payload', 'object')])
+            ('protocol', 'object')]
 
+        if payload:
+            items.append(('payload', 'object'))
+
+        dtypes = OrderedDict(items)
         df = pd.DataFrame(packets, columns=dtypes.keys())
         return df.astype(dtype=dtypes)
 
@@ -216,6 +222,7 @@ class PCAPSource(base.DataSource):
         self._urlpath = urlpath
         self._interface = None
         self._protocol = None
+        self._payload = False
 
         if self._live:
             self._chunksize = 100
@@ -228,6 +235,8 @@ class PCAPSource(base.DataSource):
             self._chunksize = pcap_kwargs['chunksize']
         if 'protocol' in pcap_kwargs:
             self._protocol = pcap_kwargs['protocol']
+        if 'payload' in pcap_kwargs:
+            self._payload = pcap_kwargs['payload']
 
         self._pcap_kwargs = pcap_kwargs
         self._dataframe = None
@@ -236,14 +245,14 @@ class PCAPSource(base.DataSource):
 
     def _get_dataframe(self):
         if self._dataframe is None:
-            def _read_stream(filename, cls, protocol, limit):
-                return cls(filename, protocol).to_dataframe(n=limit)
+            def _read_stream(filename, cls):
+                return cls(filename, self._protocol).to_dataframe(n=self._chunksize, payload=self._payload)
 
             if self._live:
-                reader = partial(_read_stream, cls=LiveStream, protocol=self._protocol, limit=self._chunksize)
+                reader = partial(_read_stream, cls=LiveStream)
                 dfs = [delayed(reader)(self._interface)]
             else:
-                reader = partial(_read_stream, cls=OfflineStream, protocol=self._protocol, limit=self._chunksize)
+                reader = partial(_read_stream, cls=OfflineStream)
                 filenames = sorted(glob(self._urlpath))
                 dfs = [delayed(reader)(filename) for filename in filenames]
             self._dataframe = dd.from_delayed(dfs)

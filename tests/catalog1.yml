@@ -10,6 +10,7 @@ sources:
     driver: pcap
     args:
       urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
+      payload: true
   tcp_http:
     driver: pcap
     args:

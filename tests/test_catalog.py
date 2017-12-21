@@ -20,7 +20,7 @@ def test_raw_http(catalog1):
     assert metadata['npartitions'] == 1
 
     df = src.read()
-    assert dataframe_has_required_columns(df)
+    assert dataframe_has_required_columns(df, payload=True)
     assert len(df) == 43
 
     src.close()
@@ -33,7 +33,7 @@ def test_tcp_http(catalog1):
     assert metadata['npartitions'] == 1
 
     df = src.read()
-    assert dataframe_has_required_columns(df)
+    assert dataframe_has_required_columns(df, payload=False)
     assert len(df) == 41
 
     src.close()
