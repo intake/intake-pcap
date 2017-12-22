@@ -1,29 +1,31 @@
 package:
   name: intake-pcap
-  version: 0.0.1
+  version: {{ GIT_DESCRIBE_TAG }}
 
 source:
   path: ..
 
 build:
-  number: 0
+  number: {{ GIT_DESCRIBE_NUMBER|int }}
   script:
-    - pip install pcapy
     - python setup.py install --single-version-externally-managed --record=record.txt
 
 requirements:
   build:
     - python
+    - jinja2
   run:
     - python
     - pandas
     - libpcap
+    - pcapy
     - dask
     - intake
 
 test:
+  source_files:
+    - tests
   requires:
-    - intake
     - pytest
     - pytest-cov
     - coverage
