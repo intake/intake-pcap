@@ -15,12 +15,12 @@ requirements:
     - python
     - jinja2
   run:
+    - intake
     - python
     - pandas
+    - dask
     - libpcap
     - pcapy
-    - dask
-    - intake
 
 test:
   source_files:
