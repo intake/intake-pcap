@@ -2,16 +2,16 @@ plugins:
   source:
     - module: intake_pcap
 sources:
-  ping:
+  - name: ping
     driver: pcap
     args:
       urlpath: !template '{{ CATALOG_DIR }}/96pings.pcap'
-  raw_http:
+  - name: raw_http
     driver: pcap
     args:
       urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
       payload: true
-  tcp_http:
+  - name: tcp_http
     driver: pcap
     args:
       urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
