@@ -26,11 +26,8 @@ install:
 
 script:
   - conda build -c "https://conda.anaconda.org/t/$ANACONDA_INTAKE_TOKEN/intake" ./conda
-
-after_success:
-  - if [[ -n "${TRAVIS_TAG}" ]]; then
-      anaconda -t ${ANACONDA_INTAKE_TOKEN} upload `conda build -c intake/label/main --output ./conda`
-    fi
+  - if [[ -n "${TRAVIS_TAG}" ]]; then anaconda -t ${ANACONDA_INTAKE_TOKEN}
+    upload `conda build -c intake/label/main --output ./conda`; fi
 
 notifications:
   email: false
