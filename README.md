@@ -1,6 +1,6 @@
 ### Installation
 
-While `requirements,txt` contains the package dependencies, we currently need to
+While `requirements.txt` contains the package dependencies, we currently need to
 install a mixture of conda and pip packages. The install instructions are:
 
 ```
