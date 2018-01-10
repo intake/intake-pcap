@@ -2,19 +2,23 @@ plugins:
   source:
     - module: intake_pcap
 sources:
-  local:
-    driver: pcap
-    args:
-      urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
-  raw_live:
-    driver: pcap
-    args:
-      urlpath: ~
-      interface: en0
-  udp_live:
+  - name: raw_live
     driver: pcap
     args:
       urlpath: ~
       interface: en0
       chunksize: 10
+  - name: raw_local
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
+  - name: tcp_local
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
+      protocol: tcp
+  - name: udp_local
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
       protocol: udp
