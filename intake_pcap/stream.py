@@ -64,11 +64,31 @@ class PacketStream(object):
 
 class LiveStream(PacketStream):
     def __init__(self, interface, protocol=None, max_packet=2**16, timeout=1000):
+        """
+        Parameters:
+            interface : str
+                Network interface from which to capture packets.
+            protocol : str
+                Exclude all other IP traffic except packets matching this
+                protocol. If None, all traffic is shown.
+            max_packet : int
+                Maximum allowed packet size.
+            timeout: int
+                Maximum time to wait for packets from interface.
+        """
         reader = pcapy.open_live(interface, max_packet, 1, timeout)
         super(LiveStream, self).__init__(reader, protocol)
 
 
 class OfflineStream(PacketStream):
     def __init__(self, path, protocol=None):
+        """
+        Parameters:
+            path : str
+                Absolute path to source file.
+            protocol : str
+                Exclude all other IP traffic except packets matching this
+                protocol. If None, all traffic is shown.
+        """
         reader = pcapy.open_offline(path)
         super(OfflineStream, self).__init__(reader, protocol)

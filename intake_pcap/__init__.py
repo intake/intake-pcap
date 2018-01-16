@@ -14,6 +14,13 @@ class Plugin(base.Plugin):
         super(Plugin, self).__init__(name='pcap', version='0.1', container='dataframe', partition_access=False)
 
     def open(self, urlpath, **kwargs):
+        """
+        Parameters:
+            urlpath : str
+                Absolute or relative path to source files that can contain shell-style wildcards.
+            kwargs : dict
+                Additional parameters to pass to ``intake_ppad.stream.PacketStream`` subclass.
+        """
         base_kwargs, source_kwargs = self.separate_base_kwargs(kwargs)
         return PCAPSource(urlpath=urlpath, pcap_kwargs=source_kwargs, metadata=base_kwargs['metadata'])
 
