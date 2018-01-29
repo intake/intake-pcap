@@ -61,7 +61,7 @@ class PCAPSource(base.DataSource):
     def _get_dataframe(self):
         if self._dataframe is None:
             def _read_stream(filename, cls):
-                return cls(filename, self._protocol).to_dataframe(n=self._chunksize, payload=self._payload)
+                return cls(filename, self._protocol, self._payload).to_dataframe(n=self._chunksize)
 
             if self._live:
                 reader = partial(_read_stream, cls=LiveStream)

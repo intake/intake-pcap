@@ -8,9 +8,25 @@ from .packet import IPPacket
 
 
 class PacketStream(object):
-    def __init__(self, reader, protocol):
+    def __init__(self, reader, protocol, payload):
         self._reader = reader
+        self._payload = payload
         self.to_bpf(protocol)
+
+    @property
+    def dtype(self):
+        items = [
+            ('time', 'datetime64[ns]'),
+            ('src_host', 'object'),
+            ('src_port', 'object'),
+            ('dst_host', 'object'),
+            ('dst_port', 'object'),
+            ('protocol', 'object')]
+
+        if self._payload:
+            items.append(('payload', 'object'))
+
+        return OrderedDict(items)
 
     def to_bpf(self, protocol):
         if protocol:
@@ -18,7 +34,7 @@ class PacketStream(object):
         else:
             self._bpf = "ip"
 
-    def to_dataframe(self, n=-1, payload=False):
+    def to_dataframe(self, n=-1):
         packets = []
 
         def decode_ip_packet(header, data):
@@ -35,7 +51,7 @@ class PacketStream(object):
                 ('dst_port', packet.destination_ip_port),
                 ('protocol', packet.ip_protocol)]
 
-            if payload:
+            if self._payload:
                 items.append(('payload', packet.payload))
 
             return dict(items)
@@ -46,24 +62,12 @@ class PacketStream(object):
         self._reader.setfilter(self._bpf)
         self._reader.loop(n, decoder)
 
-        items = [
-            ('time', 'datetime64[ns]'),
-            ('src_host', 'object'),
-            ('src_port', 'object'),
-            ('dst_host', 'object'),
-            ('dst_port', 'object'),
-            ('protocol', 'object')]
-
-        if payload:
-            items.append(('payload', 'object'))
-
-        dtypes = OrderedDict(items)
-        df = pd.DataFrame(packets, columns=dtypes.keys())
-        return df.astype(dtype=dtypes)
+        df = pd.DataFrame(packets, columns=self.dtype.keys())
+        return df.astype(dtype=self.dtype)
 
 
 class LiveStream(PacketStream):
-    def __init__(self, interface, protocol=None, max_packet=2**16, timeout=1000):
+    def __init__(self, interface, protocol=None, payload=False, max_packet=2**16, timeout=1000):
         """
         Parameters:
             interface : str
@@ -71,17 +75,19 @@ class LiveStream(PacketStream):
             protocol : str
                 Exclude all other IP traffic except packets matching this
                 protocol. If None, all traffic is shown.
+            payload : bool
+                Toggle whether to include packet data.
             max_packet : int
                 Maximum allowed packet size.
             timeout: int
                 Maximum time to wait for packets from interface.
         """
         reader = pcapy.open_live(interface, max_packet, 1, timeout)
-        super(LiveStream, self).__init__(reader, protocol)
+        super(LiveStream, self).__init__(reader, protocol, payload)
 
 
 class OfflineStream(PacketStream):
-    def __init__(self, path, protocol=None):
+    def __init__(self, path, protocol=None, payload=False):
         """
         Parameters:
             path : str
@@ -89,6 +95,8 @@ class OfflineStream(PacketStream):
             protocol : str
                 Exclude all other IP traffic except packets matching this
                 protocol. If None, all traffic is shown.
+            payload : bool
+                Toggle whether to include packet data.
         """
         reader = pcapy.open_offline(path)
-        super(OfflineStream, self).__init__(reader, protocol)
+        super(OfflineStream, self).__init__(reader, protocol, payload)
