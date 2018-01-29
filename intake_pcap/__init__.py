@@ -54,57 +54,34 @@ class PCAPSource(base.DataSource):
             self._payload = pcap_kwargs['payload']
 
         self._pcap_kwargs = pcap_kwargs
-        self._dataframe = None
+        self._streams = None
 
         super(PCAPSource, self).__init__(container='dataframe', metadata=metadata)
 
-    def _get_dataframe(self):
-        if self._dataframe is None:
-            def _read_stream(filename, cls):
-                return cls(filename, self._protocol, self._payload).to_dataframe(n=self._chunksize)
+    def _get_schema(self):
+        if self._streams is None:
+            def _read_stream(src, cls):
+                return cls(src, self._protocol, self._payload)
 
             if self._live:
                 reader = partial(_read_stream, cls=LiveStream)
-                dfs = [delayed(reader)(self._interface)]
+                self._streams = [reader(self._interface)]
             else:
                 reader = partial(_read_stream, cls=OfflineStream)
                 filenames = sorted(glob(self._urlpath))
-                dfs = [delayed(reader)(filename) for filename in filenames]
-            self._dataframe = dd.from_delayed(dfs)
+                self._streams = [reader(filename) for filename in filenames]
 
-            dtypes = self._dataframe.dtypes
-            self.datashape = None
-            self.dtype = list(zip(dtypes.index, dtypes))
-            self.shape = (len(self._dataframe),)
-            self.npartitions = self._dataframe.npartitions
+        # All streams have same schema
+        dtypes = self._streams[0].dtype
 
-        return self._dataframe
+        return base.Schema(datashape=None,
+                           dtype=dtypes,
+                           shape=(None, len(dtypes)),
+                           npartitions=len(self._streams),
+                           extra_metadata={})
 
-    def discover(self):
-        self._get_dataframe()
-        return dict(datashape=self.datashape, dtype=self.dtype, shape=self.shape, npartitions=self.npartitions)
+    def _get_partition(self, i):
+        return self._streams[i].to_dataframe(n=self._chunksize)
 
-    def read(self):
-        return self._get_dataframe().compute()
-
-    def read_chunked(self):
-        df = self._get_dataframe()
-
-        for i in range(df.npartitions):
-            yield df.get_partition(i).compute()
-
-    def read_partition(self, i):
-        df = self._get_dataframe()
-        return df.get_partition(i).compute()
-
-    def to_dask(self):
-        return self._get_dataframe()
-
-    def close(self):
-        self._dataframe = None
-
-    def __getstate__(self):
-        return self._init_args
-
-    def __setstate__(self, state):
-        self.__init__(**state)
+    def _close(self):
+        self._streams = None
