@@ -7,9 +7,10 @@ class IPPacket(object):
         self._decode(data)
 
     def _decode(self, raw):
-        ETHERNET_HEADER_LEN = 14
-        ETHERNET_HEADER_FORMAT = '!6s6sH'
-        ETHERNET_PROTOCOL_IPV4 = 8
+        ETHERNET_VLAN_LEN = 4
+        ETHERNET_TYPE_LEN = 2
+        ETHERNET_TYPE_FORMAT = '!H'
+        ETHERNET_PROTOCOL_IPV4 = 0x0800
 
         IP_HEADER_LEN = 20
         IP_HEADER_FORMAT = '!BBHHHBBH4s4s'
@@ -37,17 +38,25 @@ class IPPacket(object):
         self._dst_ip_address = None
         self._dst_ip_port = None
 
-        ethnet_header = raw[:ETHERNET_HEADER_LEN]
-        ethnet = struct.unpack(ETHERNET_HEADER_FORMAT, ethnet_header)
+        ethernet_header_len = 12  # two MAC addresses
 
-        self._ethernet_protocol = socket.ntohs(ethnet[2])
+        # skip all Ethernet VLAN tags (802.1q, 802.1ad)
+        while True:
+            data = raw[ethernet_header_len:ethernet_header_len + ETHERNET_TYPE_LEN]
+            ethertype, = struct.unpack(ETHERNET_TYPE_FORMAT, data)
+            if ethertype not in [0x8100, 0x88A8, 0x9100]:
+                ethernet_header_len += ETHERNET_TYPE_LEN
+                break
+            ethernet_header_len += ETHERNET_VLAN_LEN
+
+        self._ethernet_protocol = ethertype
         self._ip_protocol = None
         self._payload = None
 
         if self._ethernet_protocol != ETHERNET_PROTOCOL_IPV4:
             return
 
-        ip_header = raw[ETHERNET_HEADER_LEN:ETHERNET_HEADER_LEN + IP_HEADER_LEN]
+        ip_header = raw[ethernet_header_len:ethernet_header_len + IP_HEADER_LEN]
         iph = struct.unpack(IP_HEADER_FORMAT, ip_header)
         iph_length = (iph[0] & 0xF) * 4
 
@@ -56,13 +65,13 @@ class IPPacket(object):
         self._dst_ip_address = socket.inet_ntoa(iph[9])
 
         if self._ip_protocol == IP_PROTOCOL_ICMP:
-            u = ETHERNET_HEADER_LEN + iph_length
+            u = ethernet_header_len + iph_length
             icmp_header = raw[u:u + ICMP_HEADER_LEN]
 
-            h_size = ETHERNET_HEADER_LEN + iph_length + ICMP_HEADER_LEN
+            h_size = ethernet_header_len + iph_length + ICMP_HEADER_LEN
             self._payload = raw[h_size:]
         elif self._ip_protocol == IP_PROTOCOL_TCP:
-            t = ETHERNET_HEADER_LEN + iph_length
+            t = ethernet_header_len + iph_length
             tcp_header = raw[t:t + TCP_HEADER_LEN]
             tcph = struct.unpack(TCP_HEADER_FORMAT, tcp_header)
 
@@ -70,10 +79,10 @@ class IPPacket(object):
             self._dst_ip_port = tcph[1]
             tcph_length = tcph[4] >> 4
 
-            h_size = ETHERNET_HEADER_LEN + iph_length + tcph_length * 4
+            h_size = ethernet_header_len + iph_length + tcph_length * 4
             self._payload = raw[h_size:]
         elif self._ip_protocol == IP_PROTOCOL_UDP:
-            u = ETHERNET_HEADER_LEN + iph_length
+            u = ethernet_header_len + iph_length
             udph_length = UDP_HEADER_LEN
             udp_header = raw[u:u + UDP_HEADER_LEN]
             udph = struct.unpack(UDP_HEADER_FORMAT, udp_header)
@@ -81,7 +90,7 @@ class IPPacket(object):
             self._src_ip_port = udph[0]
             self._dst_ip_port = udph[1]
 
-            h_size = ETHERNET_HEADER_LEN + iph_length + udph_length
+            h_size = ethernet_header_len + iph_length + udph_length
             self._payload = raw[h_size:]
 
     @property

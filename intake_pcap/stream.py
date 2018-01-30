@@ -30,9 +30,9 @@ class PacketStream(object):
 
     def to_bpf(self, protocol):
         if protocol:
-            self._bpf = "ip proto \{}".format(protocol)
+            self._bpf = "ip proto \{0} || (vlan && ip proto \{0})".format(protocol)
         else:
-            self._bpf = "ip"
+            self._bpf = "ip || (vlan && ip)"
 
     def to_dataframe(self, n=-1):
         packets = []
