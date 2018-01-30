@@ -25,10 +25,10 @@ def test_filtered_source(tcp_http_source):
 
 def test_multiple_source(multiple_source):
     metadata = multiple_source.discover()
-    assert metadata['npartitions'] == 2
+    assert metadata['npartitions'] == 3
 
     df = multiple_source.read()
     assert dataframe_has_required_columns(df, payload=False)
-    assert len(df) == 139
+    assert len(df) == 157
 
     multiple_source.close()

@@ -32,3 +32,10 @@ def test_offline_limit(http_stream):
     df = http_stream.to_dataframe(n=10)
     assert dataframe_has_required_columns(df, payload=False)
     assert len(df) == 10
+
+
+def test_offline_filter_vlan(vlan_stream):
+    vlan_stream.to_bpf("tcp")
+    df = vlan_stream.to_dataframe()
+    assert dataframe_has_required_columns(df, payload=False)
+    assert len(df) == 18
