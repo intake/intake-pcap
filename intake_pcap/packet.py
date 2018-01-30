@@ -2,11 +2,22 @@ import socket
 import struct
 
 
+def decode_mac_address(addr):
+    return ":".join(["%.2x".format(chunk) for chunk in addr])
+
+
 class IPPacket(object):
     def __init__(self, data):
-        self._decode(data)
+        self._src_ip_address = None
+        self._src_ip_port = None
+        self._dst_ip_address = None
+        self._dst_ip_port = None
+        self._ip_protocol = None
+        self._payload = None
 
-    def _decode(self, raw):
+        self._parse(data)
+
+    def _parse(self, raw):
         ETHERNET_VLAN_LEN = 4
         ETHERNET_TYPE_LEN = 2
         ETHERNET_TYPE_FORMAT = '!H'
@@ -27,16 +38,8 @@ class IPPacket(object):
         UDP_HEADER_LEN = 8
         UDP_HEADER_FORMAT = '!HHHH'
 
-        def decode_mac_address(addr):
-            return ":".join(["%.2x".format(chunk) for chunk in addr])
-
-        self._src_mac_address = decode_mac_address(raw[6:12])
-        self._src_ip_address = None
-        self._src_ip_port = None
-
-        self._dst_mac_address = decode_mac_address(raw[0:6])
-        self._dst_ip_address = None
-        self._dst_ip_port = None
+        self._src_mac_address = raw[6:12]
+        self._dst_mac_address = raw[0:6]
 
         ethernet_header_len = 12  # two MAC addresses
 
@@ -50,8 +53,6 @@ class IPPacket(object):
             ethernet_header_len += ETHERNET_VLAN_LEN
 
         self._ethernet_protocol = ethertype
-        self._ip_protocol = None
-        self._payload = None
 
         if self._ethernet_protocol != ETHERNET_PROTOCOL_IPV4:
             return
@@ -95,11 +96,11 @@ class IPPacket(object):
 
     @property
     def source_mac_address(self):
-        return self._src_mac_address
+        return decode_mac_address(self._src_mac_address)
 
     @property
     def destination_mac_address(self):
-        return self._dst_mac_address
+        return decode_mac_address(self._dst_mac_address)
 
     @property
     def ethernet_protocol(self):
