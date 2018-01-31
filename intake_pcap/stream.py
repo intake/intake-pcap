@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import datetime
 
 import pandas as pd
 
@@ -23,7 +24,7 @@ class PacketStream(object):
 
         def decode_ip_packet(header, data):
             seconds, fractional = header.getts()
-            ts = pd.to_datetime(10**6 * seconds + fractional, unit='us')
+            ts = datetime.utcfromtimestamp(seconds + fractional / 10**6)
 
             packet = IPPacket(data)
 
