@@ -1,9 +1,11 @@
 import socket
 import struct
 
+MAC_ADDRESS_TEMPLATE = ":".join(['%.2x'] * 6)
+
 
 def decode_mac_address(addr):
-    return ":".join(["%.2x".format(chunk) for chunk in addr])
+    return MAC_ADDRESS_TEMPLATE % tuple(addr)
 
 
 class IPPacket(object):
