@@ -1,8 +1,4 @@
-from functools import partial
 from glob import glob
-
-from dask.delayed import delayed
-import dask.dataframe as dd
 
 from intake.source import base
 
