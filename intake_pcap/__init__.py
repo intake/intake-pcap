@@ -55,21 +55,24 @@ class PCAPSource(base.DataSource):
 
         self._pcap_kwargs = pcap_kwargs
         self._streams = None
+        self._stream_class = None
+        self._stream_sources = None
 
         super(PCAPSource, self).__init__(container='dataframe', metadata=metadata)
 
+    def _create_stream(self, src):
+        return self._stream_class(src, self._protocol, self._payload)
+
     def _get_schema(self):
         if self._streams is None:
-            def _read_stream(src, cls):
-                return cls(src, self._protocol, self._payload)
-
             if self._live:
-                reader = partial(_read_stream, cls=LiveStream)
-                self._streams = [reader(self._interface)]
+                self._stream_class = LiveStream
+                self._stream_sources = [self._interface]
             else:
-                reader = partial(_read_stream, cls=OfflineStream)
-                filenames = sorted(glob(self._urlpath))
-                self._streams = [reader(filename) for filename in filenames]
+                self._stream_class = OfflineStream
+                self._stream_sources = sorted(glob(self._urlpath))
+
+            self._streams = [self._create_stream(src) for src in self._stream_sources]
 
         # All streams have same schema
         dtypes = self._streams[0].dtype
@@ -81,7 +84,15 @@ class PCAPSource(base.DataSource):
                            extra_metadata={})
 
     def _get_partition(self, i):
-        return self._streams[i].to_dataframe(n=self._chunksize)
+        df = self._streams[i].to_dataframe(n=self._chunksize)
+
+        # Since pcapy doesn't make it easy to reset a stream iterator,
+        # we need to close and re-open the stream after reading
+        self._streams[i] = self._create_stream(self._stream_sources[i])
+
+        return df
 
     def _close(self):
         self._streams = None
+        self._stream_class = None
+        self._stream_sources = None
