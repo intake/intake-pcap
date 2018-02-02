@@ -1,8 +1,4 @@
-from functools import partial
 from glob import glob
-
-from dask.delayed import delayed
-import dask.dataframe as dd
 
 from intake.source import base
 
@@ -54,57 +50,45 @@ class PCAPSource(base.DataSource):
             self._payload = pcap_kwargs['payload']
 
         self._pcap_kwargs = pcap_kwargs
-        self._dataframe = None
+        self._streams = None
+        self._stream_class = None
+        self._stream_sources = None
 
         super(PCAPSource, self).__init__(container='dataframe', metadata=metadata)
 
-    def _get_dataframe(self):
-        if self._dataframe is None:
-            def _read_stream(filename, cls):
-                return cls(filename, self._protocol).to_dataframe(n=self._chunksize, payload=self._payload)
+    def _create_stream(self, src):
+        return self._stream_class(src, self._protocol, self._payload)
 
+    def _get_schema(self):
+        if self._streams is None:
             if self._live:
-                reader = partial(_read_stream, cls=LiveStream)
-                dfs = [delayed(reader)(self._interface)]
+                self._stream_class = LiveStream
+                self._stream_sources = [self._interface]
             else:
-                reader = partial(_read_stream, cls=OfflineStream)
-                filenames = sorted(glob(self._urlpath))
-                dfs = [delayed(reader)(filename) for filename in filenames]
-            self._dataframe = dd.from_delayed(dfs)
+                self._stream_class = OfflineStream
+                self._stream_sources = sorted(glob(self._urlpath))
 
-            dtypes = self._dataframe.dtypes
-            self.datashape = None
-            self.dtype = list(zip(dtypes.index, dtypes))
-            self.shape = (len(self._dataframe),)
-            self.npartitions = self._dataframe.npartitions
+            self._streams = [self._create_stream(src) for src in self._stream_sources]
 
-        return self._dataframe
+        # All streams have same schema
+        dtypes = self._streams[0].dtype
 
-    def discover(self):
-        self._get_dataframe()
-        return dict(datashape=self.datashape, dtype=self.dtype, shape=self.shape, npartitions=self.npartitions)
+        return base.Schema(datashape=None,
+                           dtype=dtypes,
+                           shape=(None, len(dtypes)),
+                           npartitions=len(self._streams),
+                           extra_metadata={})
 
-    def read(self):
-        return self._get_dataframe().compute()
+    def _get_partition(self, i):
+        df = self._streams[i].to_dataframe(n=self._chunksize)
 
-    def read_chunked(self):
-        df = self._get_dataframe()
+        # Since pcapy doesn't make it easy to reset a stream iterator,
+        # we need to close and re-open the stream after reading
+        self._streams[i] = self._create_stream(self._stream_sources[i])
 
-        for i in range(df.npartitions):
-            yield df.get_partition(i).compute()
+        return df
 
-    def read_partition(self, i):
-        df = self._get_dataframe()
-        return df.get_partition(i).compute()
-
-    def to_dask(self):
-        return self._get_dataframe()
-
-    def close(self):
-        self._dataframe = None
-
-    def __getstate__(self):
-        return self._init_args
-
-    def __setstate__(self, state):
-        self.__init__(**state)
+    def _close(self):
+        self._streams = None
+        self._stream_class = None
+        self._stream_sources = None

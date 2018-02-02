@@ -32,3 +32,18 @@ def test_multiple_source(multiple_source):
     assert len(df) == 139
 
     multiple_source.close()
+
+
+def test_repeated_reads(ping_source):
+    metadata = ping_source.discover()
+    assert metadata['npartitions'] == 1
+
+    df = ping_source.read()
+    assert dataframe_has_required_columns(df, payload=False)
+    assert len(df) == 96
+
+    df = ping_source.read()
+    assert dataframe_has_required_columns(df, payload=False)
+    assert len(df) == 96
+
+    ping_source.close()
