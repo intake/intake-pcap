@@ -11,5 +11,5 @@ if __name__ == '__main__':
 
     ostream = OfflineStream(sys.argv[1])
     if len(sys.argv) > 2:
-        ostream.to_bpf(sys.argv[2])
+        ostream.set_filter(sys.argv[2])
     print(ostream.to_dataframe())

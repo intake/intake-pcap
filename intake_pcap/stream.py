@@ -16,7 +16,7 @@ class PacketStream(object):
     def __init__(self, reader, protocol, payload):
         self._reader = reader
         self._payload = payload
-        self.to_bpf(protocol)
+        self.set_filter(protocol)
 
     @property
     def dtype(self):
@@ -33,11 +33,21 @@ class PacketStream(object):
 
         return OrderedDict(items)
 
-    def to_bpf(self, protocol):
+    def set_filter(self, protocol):
+        """
+        Filters all IP traffic except packets matching given protocol.
+
+        Parameters:
+            protocol : str
+                Show only traffic for given IP protocol.
+
+                Allowed values are icmp, icmp6, igmp, igrp, pim, ah,
+                esp, vrrp, udp, and tcp. If None, all traffic is shown.
+        """
         if protocol:
-            self._bpf = "ip proto \{}".format(protocol)
+            self._bpf = "ip proto \{0} || (vlan && ip proto \{0})".format(protocol)
         else:
-            self._bpf = "ip"
+            self._bpf = "ip || (vlan && ip)"
 
     def to_dataframe(self, n=-1):
         packets = []
