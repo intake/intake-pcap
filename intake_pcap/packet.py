@@ -52,8 +52,8 @@ class IPPacket(object):
         iph_length = (iph[0] & 0xF) * 4
 
         self._ip_protocol = iph[6]
-        self._src_ip_address = socket.inet_ntoa(iph[8])
-        self._dst_ip_address = socket.inet_ntoa(iph[9])
+        self._src_ip_address = iph[8]
+        self._dst_ip_address = iph[9]
 
         if self._ip_protocol == IP_PROTOCOL_ICMP:
             u = ETHERNET_HEADER_LEN + iph_length
@@ -104,11 +104,11 @@ class IPPacket(object):
 
     @property
     def source_ip_address(self):
-        return self._src_ip_address
+        return socket.inet_ntoa(self._src_ip_address)
 
     @property
     def destination_ip_address(self):
-        return self._dst_ip_address
+        return socket.inet_ntoa(self._dst_ip_address)
 
     @property
     def source_ip_port(self):
