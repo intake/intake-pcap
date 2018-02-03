@@ -1,10 +1,15 @@
-from collections import OrderedDict
+from collections import namedtuple, OrderedDict
 
 import pandas as pd
 
 import pcapy
 
 from .packet import IPPacket
+
+
+base_columns = ['time', 'src_host', 'src_port', 'dst_host', 'dst_port', 'protocol']
+BasePacket = namedtuple('BasePacket', base_columns)
+FullPacket = namedtuple('FullPacket', base_columns + ['payload'])
 
 
 class PacketStream(object):
@@ -43,18 +48,21 @@ class PacketStream(object):
 
             packet = IPPacket(data)
 
-            items = [
-                ('time', ts),
-                ('src_host', packet.source_ip_address),
-                ('src_port', packet.source_ip_port),
-                ('dst_host', packet.destination_ip_address),
-                ('dst_port', packet.destination_ip_port),
-                ('protocol', packet.ip_protocol)]
-
             if self._payload:
-                items.append(('payload', packet.payload))
+                return FullPacket(ts,
+                                  packet.source_ip_address,
+                                  packet.source_ip_port,
+                                  packet.destination_ip_address,
+                                  packet.destination_ip_port,
+                                  packet.ip_protocol,
+                                  packet.payload)
 
-            return dict(items)
+            return BasePacket(ts,
+                              packet.source_ip_address,
+                              packet.source_ip_port,
+                              packet.destination_ip_address,
+                              packet.destination_ip_port,
+                              packet.ip_protocol)
 
         def decoder(header, data):
             packets.append(decode_ip_packet(header, data))
@@ -62,7 +70,8 @@ class PacketStream(object):
         self._reader.setfilter(self._bpf)
         self._reader.loop(n, decoder)
 
-        df = pd.DataFrame(packets, columns=self.dtype.keys())
+        columns = FullPacket._fields if self._payload else BasePacket._fields
+        df = pd.DataFrame(packets, columns=columns)
         return df.astype(dtype=self.dtype)
 
 
