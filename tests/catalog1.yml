@@ -16,3 +16,13 @@ sources:
     args:
       urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
       protocol: tcp
+  - name: raw_vlan
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/vlan.pcap'
+      payload: true
+  - name: tcp_vlan
+    driver: pcap
+    args:
+      urlpath: !template '{{ CATALOG_DIR }}/vlan.pcap'
+      protocol: tcp
