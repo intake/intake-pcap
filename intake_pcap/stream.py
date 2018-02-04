@@ -23,8 +23,8 @@ class PacketStream(object):
         packets = []
 
         def decode_ip_packet(header, data):
-            seconds, fractional = header.getts()
-            ts = datetime.utcfromtimestamp(seconds + fractional / 10**6)
+            seconds, fractional = header.getts()  # fractional is in microseconds
+            ts = seconds * 10**9 + fractional * 10**3  # convert to nanoseconds
 
             packet = IPPacket(data)
 
