@@ -65,7 +65,7 @@ class PacketStream(object):
                                   packet.destination_ip_address,
                                   packet.destination_ip_port,
                                   packet.ip_protocol,
-                                  packet.payload)
+                                  data[packet.header_size])
 
             return BasePacket(ts,
                               packet.source_ip_address,

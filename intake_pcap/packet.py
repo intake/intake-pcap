@@ -15,7 +15,7 @@ class IPPacket(object):
         self._dst_ip_address = None
         self._dst_ip_port = None
         self._ip_protocol = None
-        self._payload = None
+        self.header_size = 0
 
         self._parse(data)
 
@@ -68,11 +68,7 @@ class IPPacket(object):
         self._dst_ip_address = iph[9]
 
         if self._ip_protocol == IP_PROTOCOL_ICMP:
-            u = ethernet_header_len + iph_length
-            icmp_header = raw[u:u + ICMP_HEADER_LEN]
-
-            h_size = ethernet_header_len + iph_length + ICMP_HEADER_LEN
-            self._payload = raw[h_size:]
+            self.header_size = ethernet_header_len + iph_length + ICMP_HEADER_LEN
         elif self._ip_protocol == IP_PROTOCOL_TCP:
             t = ethernet_header_len + iph_length
             tcp_header = raw[t:t + TCP_HEADER_LEN]
@@ -82,8 +78,7 @@ class IPPacket(object):
             self._dst_ip_port = tcph[1]
             tcph_length = tcph[4] >> 4
 
-            h_size = ethernet_header_len + iph_length + tcph_length * 4
-            self._payload = raw[h_size:]
+            self.header_size = ethernet_header_len + iph_length + tcph_length * 4
         elif self._ip_protocol == IP_PROTOCOL_UDP:
             u = ethernet_header_len + iph_length
             udph_length = UDP_HEADER_LEN
@@ -93,8 +88,7 @@ class IPPacket(object):
             self._src_ip_port = udph[0]
             self._dst_ip_port = udph[1]
 
-            h_size = ethernet_header_len + iph_length + udph_length
-            self._payload = raw[h_size:]
+            self.header_size = ethernet_header_len + iph_length + udph_length
 
     @property
     def source_mac_address(self):
@@ -129,7 +123,3 @@ class IPPacket(object):
     @property
     def destination_ip_port(self):
         return self._dst_ip_port
-
-    @property
-    def payload(self):
-        return self._payload
