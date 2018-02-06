@@ -26,7 +26,7 @@ class PacketStream(object):
             ('src_port', 'category'),
             ('dst_host', 'category'),
             ('dst_port', 'category'),
-            ('protocol', 'category')]
+            ('protocol', 'int')]
 
         if self._payload:
             items.append(('payload', 'object'))
@@ -54,7 +54,8 @@ class PacketStream(object):
 
         def decode_ip_packet(header, data):
             seconds, fractional = header.getts()
-            ts = pd.to_datetime(10**6 * seconds + fractional, unit='us')
+            #ts = pd.to_datetime(10**6 * seconds + fractional, unit='us')
+            ts = seconds * 10**9 + fractional * 10**3
 
             packet = IPPacket(data)
 
@@ -65,7 +66,7 @@ class PacketStream(object):
                                   packet.destination_ip_address,
                                   packet.destination_ip_port,
                                   packet.ip_protocol,
-                                  data[packet.header_size])
+                                  data[packet.header_size:])
 
             return BasePacket(ts,
                               packet.source_ip_address,
