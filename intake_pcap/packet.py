@@ -11,10 +11,10 @@ def decode_mac_address(addr):
 class IPPacket(object):
     def __init__(self, data):
         self._src_ip_address = None
-        self._src_ip_port = None
+        self._src_ip_port = 0
         self._dst_ip_address = None
-        self._dst_ip_port = None
-        self._ip_protocol = None
+        self._dst_ip_port = 0
+        self._ip_protocol = 0
         self.header_size = 0
 
         self._parse(data)
