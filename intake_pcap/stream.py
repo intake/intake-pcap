@@ -22,11 +22,11 @@ class PacketStream(object):
     def dtype(self):
         items = [
             ('time', 'datetime64[ns]'),
-            ('src_host', 'category'),
-            ('src_port', 'category'),
-            ('dst_host', 'category'),
-            ('dst_port', 'category'),
-            ('protocol', 'category')]
+            ('src_host', 'object'),
+            ('src_port', 'u4'),
+            ('dst_host', 'object'),
+            ('dst_port', 'u4'),
+            ('protocol', 'str')]
 
         if self._payload:
             items.append(('payload', 'object'))
