@@ -11,11 +11,11 @@ def decode_mac_address(addr):
 class IPPacket(object):
     def __init__(self, data):
         self._src_ip_address = None
-        self._src_ip_port = None
+        self._src_ip_port = 0
         self._dst_ip_address = None
-        self._dst_ip_port = None
-        self._ip_protocol = None
-        self._payload = None
+        self._dst_ip_port = 0
+        self._ip_protocol = 0
+        self.header_size = 0
 
         self._parse(data)
 
@@ -64,15 +64,11 @@ class IPPacket(object):
         iph_length = (iph[0] & 0xF) * 4
 
         self._ip_protocol = iph[6]
-        self._src_ip_address = socket.inet_ntoa(iph[8])
-        self._dst_ip_address = socket.inet_ntoa(iph[9])
+        self._src_ip_address = iph[8]
+        self._dst_ip_address = iph[9]
 
         if self._ip_protocol == IP_PROTOCOL_ICMP:
-            u = ethernet_header_len + iph_length
-            icmp_header = raw[u:u + ICMP_HEADER_LEN]
-
-            h_size = ethernet_header_len + iph_length + ICMP_HEADER_LEN
-            self._payload = raw[h_size:]
+            self.header_size = ethernet_header_len + iph_length + ICMP_HEADER_LEN
         elif self._ip_protocol == IP_PROTOCOL_TCP:
             t = ethernet_header_len + iph_length
             tcp_header = raw[t:t + TCP_HEADER_LEN]
@@ -82,8 +78,7 @@ class IPPacket(object):
             self._dst_ip_port = tcph[1]
             tcph_length = tcph[4] >> 4
 
-            h_size = ethernet_header_len + iph_length + tcph_length * 4
-            self._payload = raw[h_size:]
+            self.header_size = ethernet_header_len + iph_length + tcph_length * 4
         elif self._ip_protocol == IP_PROTOCOL_UDP:
             u = ethernet_header_len + iph_length
             udph_length = UDP_HEADER_LEN
@@ -93,8 +88,7 @@ class IPPacket(object):
             self._src_ip_port = udph[0]
             self._dst_ip_port = udph[1]
 
-            h_size = ethernet_header_len + iph_length + udph_length
-            self._payload = raw[h_size:]
+            self.header_size = ethernet_header_len + iph_length + udph_length
 
     @property
     def source_mac_address(self):
@@ -116,11 +110,11 @@ class IPPacket(object):
 
     @property
     def source_ip_address(self):
-        return self._src_ip_address
+        return socket.inet_ntoa(self._src_ip_address)
 
     @property
     def destination_ip_address(self):
-        return self._dst_ip_address
+        return socket.inet_ntoa(self._dst_ip_address)
 
     @property
     def source_ip_port(self):
@@ -129,7 +123,3 @@ class IPPacket(object):
     @property
     def destination_ip_port(self):
         return self._dst_ip_port
-
-    @property
-    def payload(self):
-        return self._payload
