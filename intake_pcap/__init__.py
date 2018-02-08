@@ -15,7 +15,7 @@ class Plugin(base.Plugin):
             urlpath : str
                 Absolute or relative path to source files that can contain shell-style wildcards.
             kwargs : dict
-                Additional parameters to pass to ``intake_ppad.stream.PacketStream`` subclass.
+                Additional parameters to pass to ``intake_pcap.stream.PacketStream`` subclass.
         """
         base_kwargs, source_kwargs = self.separate_base_kwargs(kwargs)
         return PCAPSource(urlpath=urlpath, pcap_kwargs=source_kwargs, metadata=base_kwargs['metadata'])
