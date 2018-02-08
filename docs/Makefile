@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = intake_ppad
+SPHINXPROJ    = intake_pcap
 SOURCEDIR     = source
 BUILDDIR      = build
 

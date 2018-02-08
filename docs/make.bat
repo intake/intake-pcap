@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set SPHINXPROJ=intake_ppad
+set SPHINXPROJ=intake_pcap
 
 if "%1" == "" goto help
 
