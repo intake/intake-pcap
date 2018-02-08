@@ -27,7 +27,7 @@ install:
 script:
   - conda build -c "https://conda.anaconda.org/t/$ANACONDA_INTAKE_TOKEN/intake" ./conda
   - if [[ -n "${TRAVIS_TAG}" ]]; then anaconda -t ${ANACONDA_INTAKE_TOKEN}
-    upload `conda build -c intake/label/main --output ./conda`; fi
+    upload -u intake --force `conda build -c intake/label/main --output ./conda`; fi
 
 notifications:
   email: false
