@@ -5,6 +5,7 @@ Welcome to intake_pcap's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   quickstart.rst
    api.rst
 
 
