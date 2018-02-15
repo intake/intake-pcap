@@ -141,7 +141,7 @@ This example will show the first 10 packets from ``local.pcap``. Each packet
 will be timestamped and the raw IP address will be displayed. No packets
 will be filtered. The exact output will vary depending on your local machine::
 
-  $ sudo tcpdump -c 10 -tttt -n -q -r local.pcap
+  $ tcpdump -c 10 -tttt -n -q -r local.pcap
   2018-01-09 00:16:12.210010 IP 192.168.0.39.54703 > 172.123.4.567.443: UDP, length 1350
   2018-01-09 00:16:12.210910 IP 192.168.0.39.54703 > 172.123.4.567.443: UDP, length 998
   2018-01-09 00:16:12.236176 IP 172.123.4.567.443 > 192.168.0.39.54703: UDP, length 1350
