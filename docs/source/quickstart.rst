@@ -10,8 +10,8 @@ can find the equivalent set of network packets with the Intake PCAP plugin.
 Installation
 ------------
 
-For Anaconda or Miniconda users, the Intake PCAP plugin is installed with the
-following commands::
+For conda users, the Intake PCAP plugin is installed with the following
+commands::
 
   conda install -c intake intake-pcap
 
