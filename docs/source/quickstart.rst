@@ -22,12 +22,21 @@ the appropriate installation instructions.
 Creating Sample Data
 --------------------
 
-To bootstrap a sample PCAP file with local traffic, run the following::
+For Unix/Linux users with access to ``tcpdump``, you can bootstrap a sample PCAP
+file with local traffic using the following::
 
   sudo tcpdump -c 100 -w local.pcap
 
 This will capture 100 packets (including but not exclusive to IP traffic) from
 the default network interface and write it to a file.
+
+For other users, you can use ``examples/dump-live.py`` to write local traffic to
+a PCAP file. The syntax for this script is::
+
+  python examples/dump-live.py PATH INTERFACE LIMIT
+
+where ``PATH`` is the path to a PCAP file, ``INTERFACE`` is the OS-specific
+network interface, and ``LIMIT`` is the number of captured packets.
 
 You will also need to write a catalog description file, ``catalog.yml``, to the
 same directory as ``local.pcap`` to run the following examples. The necessary
