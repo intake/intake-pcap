@@ -19,6 +19,33 @@ If you wish to follow along with the ``tcpdump`` examples, consult your OS for
 the appropriate installation instructions.
 
 
+Reading Existing PCAP File
+--------------------------
+
+The simplest use case for this plugin is to read an existing PCAP file. Assuming
+the path to this file is in the variable, ``filename``, this will read the
+entire file into a dataframe.::
+
+  >>> import intake
+  >>> ds = intake.open_pcap(filename)
+  >>> df = ds.read()
+  >>> df
+                          time       src_host src_port       dst_host dst_port protocol
+  0 2018-01-09 08:16:12.210010   192.168.0.39    54703  172.123.4.567      443      udp
+  1 2018-01-09 08:16:12.210910   192.168.0.39    54703  172.123.4.567      443      udp
+  2 2018-01-09 08:16:12.236176  172.123.4.567      443   192.168.0.39    54703      udp
+  3 2018-01-09 08:16:12.236543  172.123.4.567      443   192.168.0.39    54703      udp
+  4 2018-01-09 08:16:12.236726   192.168.0.39    54703  172.123.4.567      443      udp
+  5 2018-01-09 08:16:12.236791   192.168.0.39    54703  172.123.4.567      443      udp
+  6 2018-01-09 08:16:12.252565  172.123.4.567      443   192.168.0.39    54703      udp
+  7 2018-01-09 08:16:12.313082  172.123.4.567      443   192.168.0.39    54703      udp
+  8 2018-01-09 08:16:12.313479  172.123.4.567      443   192.168.0.39    54703      udp
+  ...
+
+The remaining sections will describe other use cases. But first, we must setup
+a sample catalog and its associated data.
+
+
 Creating Sample Data
 --------------------
 
@@ -30,17 +57,20 @@ file with local traffic using the following::
 This will capture 100 packets (including but not exclusive to IP traffic) from
 the default network interface and write it to a file.
 
-For other users, you can use ``examples/dump-live.py`` to write local traffic to
-a PCAP file. The syntax for this script is::
+Otherwise, you can use ``examples/dump-live.py`` to write local traffic to a
+PCAP file. The syntax for this script is::
 
   python examples/dump-live.py PATH INTERFACE LIMIT
 
 where ``PATH`` is the path to a PCAP file, ``INTERFACE`` is the OS-specific
 network interface, and ``LIMIT`` is the number of captured packets.
 
-You will also need to write a catalog description file, ``catalog.yml``, to the
-same directory as ``local.pcap`` to run the following examples. The necessary
-data is::
+
+Creating a Catalog
+------------------
+
+The remaining examples assume the existence of a catalog description file,
+``catalog.yml``, in the same directory as ``local.pcap``.::
 
   sources:
     - name: raw_live
@@ -63,6 +93,9 @@ data is::
       args:
         urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
         protocol: udp
+
+This file defines several sources based on the raw sample data we created in the
+previous section. We will now describe the output associated with each entry.
 
 
 Reading a Live Stream
