@@ -9,6 +9,7 @@ build:
   number: 0
   script:
     - python setup.py install --single-version-externally-managed --record=record.txt
+  noarch: python
 
 requirements:
   build:
@@ -19,7 +20,6 @@ requirements:
     - python
     - pandas
     - dask
-    - libpcap
     - pcapy
 
 test:
