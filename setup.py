@@ -7,7 +7,7 @@ requires = open('requirements.txt').read().strip().split('\n')
 
 setup(
     name='intake-pcap',
-    version='0.0.5',
+    version='0.0.6',
     description='Intake PCAP plugin',
     url='https://github.com/ContinuumIO/intake-pcap',
     maintainer='Joseph Crail',
