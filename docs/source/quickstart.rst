@@ -73,22 +73,22 @@ The remaining examples assume the existence of a catalog description file,
 ``catalog.yml``, in the same directory as ``local.pcap``.::
 
   sources:
-    - name: raw_live
+    raw_live:
       driver: pcap
       args:
         urlpath: ~
         interface: en0
         chunksize: 10
-    - name: raw_local
+    raw_local:
       driver: pcap
       args:
         urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
-    - name: tcp_local
+    tcp_local:
       driver: pcap
       args:
         urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
         protocol: tcp
-    - name: udp_local
+    udp_local:
       driver: pcap
       args:
         urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
