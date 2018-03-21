@@ -1,3 +1,10 @@
+# Intake PCAP Plugin
+
+[![Build Status](https://travis-ci.org/ContinuumIO/intake-pcap.svg?branch=master)](https://travis-ci.org/ContinuumIO/intake-pcap)
+[![Documentation Status](https://readthedocs.org/projects/intake-pcap/badge/?version=latest)](http://intake.readthedocs.io/en/latest/?badge=latest)
+
+This plugin is for the (Intake data loader library)[http://intake.readthedocs.io/en/latest/].
+
 ### Installation
 
 While `requirements.txt` contains the package dependencies, we currently need to
