@@ -2,7 +2,7 @@ import sys
 
 import pcapy
 
-from intake_pcap import IPPacket
+from intake_pcap.packet import IPPacket
 
 
 if __name__ == '__main__':
