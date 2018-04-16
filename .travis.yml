@@ -32,8 +32,7 @@ script:
   if [ "$CONDA_PY" = "36" && "$TRAVIS_OS_NAME" = "linux" ]; then
     if [ -n "$TRAVIS_TAG" ]; then
       # If tagged git version, upload package to main channel
-        anaconda -t ${ANACONDA_TOKEN} upload -u intake --force `conda build --output ./conda`
-      fi
+      anaconda -t ${ANACONDA_TOKEN} upload -u intake --force `conda build --output ./conda`
     else
       # Otherwise upload package to dev channel
       anaconda -t ${ANACONDA_TOKEN} upload -u intake --label dev --force `conda build --output ./conda`
