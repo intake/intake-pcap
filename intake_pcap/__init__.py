@@ -4,6 +4,11 @@ from intake.source import base
 
 from .stream import LiveStream, OfflineStream
 
+from ._version import get_versions
+
+__version__ = get_versions()['version']
+del get_versions
+
 
 class Plugin(base.Plugin):
     def __init__(self):
