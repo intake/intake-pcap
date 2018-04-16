@@ -163,6 +163,3 @@ texinfo_documents = [
      author, 'intake_pcap', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
