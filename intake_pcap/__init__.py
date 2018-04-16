@@ -2,8 +2,6 @@ from glob import glob
 
 from intake.source import base
 
-from .stream import LiveStream, OfflineStream
-
 from ._version import get_versions
 
 __version__ = get_versions()['version']
@@ -66,6 +64,8 @@ class PCAPSource(base.DataSource):
 
     def _get_schema(self):
         if self._streams is None:
+            from .stream import LiveStream, OfflineStream
+
             if self._live:
                 self._stream_class = LiveStream
                 self._stream_sources = [self._interface]
