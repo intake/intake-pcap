@@ -2,7 +2,7 @@ import sys
 
 import pandas as pd
 
-from intake_pcap import LiveStream
+from intake_pcap.stream import LiveStream
 
 
 if __name__ == '__main__':
