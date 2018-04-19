@@ -4,6 +4,9 @@ os:
   - linux
   - osx
 
+git:
+  depth: false
+
 env:
   matrix:
   - CONDA_PY=27
