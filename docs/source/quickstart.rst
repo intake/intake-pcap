@@ -82,16 +82,16 @@ The remaining examples assume the existence of a catalog description file,
     raw_local:
       driver: pcap
       args:
-        urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
+        urlpath: '{{ CATALOG_DIR }}/local.pcap'
     tcp_local:
       driver: pcap
       args:
-        urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
+        urlpath: '{{ CATALOG_DIR }}/local.pcap'
         protocol: tcp
     udp_local:
       driver: pcap
       args:
-        urlpath: !template '{{ CATALOG_DIR }}/local.pcap'
+        urlpath: '{{ CATALOG_DIR }}/local.pcap'
         protocol: udp
 
 This file defines several sources based on the raw sample data we created in the
