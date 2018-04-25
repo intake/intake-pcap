@@ -1,5 +1,6 @@
 intake
 pandas
+cyberpandas
 dask
 libpcap
 pcapy

@@ -1,6 +1,7 @@
 from collections import namedtuple, OrderedDict
 
 import pandas as pd
+from cyberpandas import to_ipaddress
 
 import pcapy
 
@@ -22,9 +23,9 @@ class PacketStream(object):
     def dtype(self):
         items = [
             ('time', 'datetime64[ns]'),
-            ('src_host', 'object'),
+            ('src_host', 'ip'),
             ('src_port', 'u4'),
-            ('dst_host', 'object'),
+            ('dst_host', 'ip'),
             ('dst_port', 'u4'),
             ('protocol', 'str')]
 
@@ -82,7 +83,15 @@ class PacketStream(object):
 
         columns = FullPacket._fields if self._payload else BasePacket._fields
         df = pd.DataFrame(packets, columns=columns)
-        return df.astype(dtype=self.dtype)
+
+        # DataFrame.astype doesn't work with extension types (yet).
+        # https://github.com/pandas-dev/pandas/issues/20557
+        known_types = {k: v for k, v in self.dtype.items()
+                       if k not in ('src_host', 'dst_host')}
+        df = df.astype(known_types)
+        df['src_host'] = to_ipaddress(df['src_host'])
+        df['dst_host'] = to_ipaddress(df['dst_host'])
+        return df
 
 
 class LiveStream(PacketStream):

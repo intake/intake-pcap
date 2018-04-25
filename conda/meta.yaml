@@ -19,6 +19,7 @@ requirements:
     - intake
     - python
     - pandas
+    - cyberpandas
     - dask
     - pcapy
 
