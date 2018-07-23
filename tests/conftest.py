@@ -2,7 +2,8 @@ import os.path
 
 import pytest
 
-from intake_pcap import OfflineStream, PCAPSource
+from intake_pcap.source import PCAPSource
+from intake_pcap.stream import OfflineStream
 
 
 @pytest.fixture

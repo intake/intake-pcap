@@ -6,7 +6,11 @@ source:
   path: ..
 
 build:
+<<<<<<< HEAD
   number: {{ GIT_DESCRIBE_NUMBER|int }}
+=======
+  number: {{ GIT_DESCRIBE_NUMBER }}
+>>>>>>> master
   script:
     - python setup.py install --single-version-externally-managed --record=record.txt
   noarch: python
@@ -19,6 +23,7 @@ requirements:
     - intake>=0.2
     - python
     - pandas
+    - cyberpandas
     - dask
     - pcapy
 
