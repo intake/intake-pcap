@@ -21,7 +21,7 @@ def ping_stream(data_filenames):
 
 @pytest.fixture
 def ping_source(data_filenames):
-    return PCAPSource(urlpath=data_filenames['ping'], pcap_kwargs={}, metadata={})
+    return PCAPSource(urlpath=data_filenames['ping'], metadata={})
 
 
 @pytest.fixture
@@ -31,12 +31,12 @@ def http_stream(data_filenames):
 
 @pytest.fixture
 def raw_http_source(data_filenames):
-    return PCAPSource(urlpath=data_filenames['http'], pcap_kwargs={}, metadata={})
+    return PCAPSource(urlpath=data_filenames['http'], metadata={})
 
 
 @pytest.fixture
 def tcp_http_source(data_filenames):
-    return PCAPSource(urlpath=data_filenames['http'], pcap_kwargs=dict(protocol="tcp"), metadata={})
+    return PCAPSource(urlpath=data_filenames['http'], protocol="tcp")
 
 
 @pytest.fixture
@@ -46,12 +46,12 @@ def vlan_stream(data_filenames):
 
 @pytest.fixture
 def raw_vlan_source(data_filenames):
-    return PCAPSource(urlpath=data_filenames['vlan'], pcap_kwargs={}, metadata={})
+    return PCAPSource(urlpath=data_filenames['vlan'])
 
 
 @pytest.fixture
 def tcp_vlan_source(data_filenames):
-    return PCAPSource(urlpath=data_filenames['vlan'], pcap_kwargs=dict(protocol="tcp"), metadata={})
+    return PCAPSource(urlpath=data_filenames['vlan'], protocol="tcp")
 
 
 @pytest.fixture
@@ -61,4 +61,4 @@ def multiple_stream(data_filenames):
 
 @pytest.fixture
 def multiple_source(data_filenames):
-    return PCAPSource(urlpath=data_filenames['multiple'], pcap_kwargs={}, metadata={})
+    return PCAPSource(urlpath=data_filenames['multiple'])

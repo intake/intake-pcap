@@ -2,8 +2,6 @@ from collections import namedtuple, OrderedDict
 
 import pandas as pd
 
-import pcapy
-
 from .packet import IPPacket
 
 
@@ -101,6 +99,7 @@ class LiveStream(PacketStream):
             timeout: int
                 Maximum time to wait for packets from interface.
         """
+        import pcapy
         reader = pcapy.open_live(interface, max_packet, 1, timeout)
         super(LiveStream, self).__init__(reader, protocol, payload)
 
@@ -117,5 +116,6 @@ class OfflineStream(PacketStream):
             payload : bool
                 Toggle whether to include packet data.
         """
+        import pcapy
         reader = pcapy.open_offline(path)
         super(OfflineStream, self).__init__(reader, protocol, payload)

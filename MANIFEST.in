@@ -1,0 +1,2 @@
+include versioneer.py
+include intake_pcap/_version.py

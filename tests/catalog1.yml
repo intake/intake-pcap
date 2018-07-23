@@ -5,24 +5,24 @@ sources:
   ping:
     driver: pcap
     args:
-      urlpath: !template '{{ CATALOG_DIR }}/96pings.pcap'
+      urlpath: '{{ CATALOG_DIR }}/96pings.pcap'
   raw_http:
     driver: pcap
     args:
-      urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
+      urlpath: '{{ CATALOG_DIR }}/http.pcap'
       payload: true
   tcp_http:
     driver: pcap
     args:
-      urlpath: !template '{{ CATALOG_DIR }}/http.pcap'
+      urlpath: '{{ CATALOG_DIR }}/http.pcap'
       protocol: tcp
   raw_vlan:
     driver: pcap
     args:
-      urlpath: !template '{{ CATALOG_DIR }}/vlan.pcap'
+      urlpath: '{{ CATALOG_DIR }}/vlan.pcap'
       payload: true
   tcp_vlan:
     driver: pcap
     args:
-      urlpath: !template '{{ CATALOG_DIR }}/vlan.pcap'
+      urlpath: '{{ CATALOG_DIR }}/vlan.pcap'
       protocol: tcp
