@@ -3,8 +3,6 @@ from collections import namedtuple, OrderedDict
 import pandas as pd
 from cyberpandas import to_ipaddress
 
-import pcapy
-
 from .packet import IPPacket
 
 
@@ -14,6 +12,9 @@ FullPacket = namedtuple('FullPacket', base_columns + ['payload'])
 
 
 class PacketStream(object):
+    """A set of IP packets
+    """
+
     def __init__(self, reader, protocol, payload):
         self._reader = reader
         self._payload = payload
@@ -110,6 +111,7 @@ class LiveStream(PacketStream):
             timeout: int
                 Maximum time to wait for packets from interface.
         """
+        import pcapy
         reader = pcapy.open_live(interface, max_packet, 1, timeout)
         super(LiveStream, self).__init__(reader, protocol, payload)
 
@@ -126,5 +128,6 @@ class OfflineStream(PacketStream):
             payload : bool
                 Toggle whether to include packet data.
         """
+        import pcapy
         reader = pcapy.open_offline(path)
         super(OfflineStream, self).__init__(reader, protocol, payload)

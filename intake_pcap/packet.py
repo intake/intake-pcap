@@ -9,7 +9,17 @@ def decode_mac_address(addr):
 
 
 class IPPacket(object):
+    """
+    A packet of data on an IP network comm
+    """
+
     def __init__(self, data):
+        """
+        Parameters
+        ----------
+        data: bytes
+            Binary packet to decode
+        """
         self._src_ip_address = None
         self._src_ip_port = 0
         self._dst_ip_address = None

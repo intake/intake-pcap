@@ -62,6 +62,7 @@ author = u'Joseph Crail'
 # built documents.
 #
 # The short X.Y version.
+import intake_pcap
 version = intake_pcap.__version__
 # The full version, including alpha/beta/rc tags.
 release = intake_pcap.__version__

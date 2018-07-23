@@ -2,7 +2,7 @@ import os.path
 
 import pytest
 
-from intake.catalog import Catalog
+from intake import open_catalog
 
 from .utils import assert_dataframe_has_required_columns
 
@@ -10,7 +10,7 @@ from .utils import assert_dataframe_has_required_columns
 @pytest.fixture
 def catalog1():
     path = os.path.dirname(__file__)
-    return Catalog(os.path.join(path, 'catalog1.yml'))
+    return open_catalog(os.path.join(path, 'catalog1.yml'))
 
 
 def test_raw_http(catalog1):
