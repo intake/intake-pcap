@@ -16,6 +16,10 @@ setup(
     maintainer_email='jbcrail@gmail.com',
     license='BSD',
     packages=find_packages(),
+    entry_points={
+        'intake.drivers': [
+            'pcap = intake_pcap.source:PCAPSource',
+        ]},
     package_data={'': ['*.pcap', '*.yml', '*.html']},
     include_package_data=True,
     install_requires=requires,
